@@ -2,7 +2,7 @@
   "name": "Cronograma Eléctrico",
   "short_name": "Cronograma",
   "start_url": "./index.html",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#0f172a",
   "theme_color": "#1e293b",
   "orientation": "portrait",
