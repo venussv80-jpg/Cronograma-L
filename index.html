@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Configuración para instalación en móviles -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    
+    <!-- Optimizaciones específicas para iOS (iPhone) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cronograma">
+
+    <title>Cronograma Eléctrico - Actualizado</title>
+    <style>
+        :root {
+            --bg-app: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary: #1e293b;
+            --accent: #3b82f6;
+            --highlight: #f59e0b;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --banner-bg: #eff6ff;
+            --banner-border: #bfdbfe;
+            --banner-text: #1e40af;
+        }
+
+        body.dark-mode {
+            --bg-app: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #f8fafc;
+            --accent: #60a5fa;
+            --highlight: #fbbf24;
+            --text-main: #cbd5e1;
+            --text-muted: #94a3b8;
+            --banner-bg: #172554;
+            --banner-border: #1e40af;
+            --banner-text: #93c5fd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            padding: 12px;
+            padding-bottom: 40px;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 15px 10px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .btn-theme {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--bg-app);
+            border: 1px solid var(--text-muted);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .favorite-selector {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .favorite-selector label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .favorite-selector select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--banner-border);
+            background: var(--bg-app);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .live-countdown-card {
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .live-countdown-card.status-active {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+        body.dark-mode .live-countdown-card.status-active {
+            background: #064e3b;
+            border-color: #047857;
+        }
+
+        .live-countdown-card.status-alert {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+        body.dark-mode .live-countdown-card.status-alert {
+            background: #7f1d1d;
+            border-color: #991b1b;
+        }
+
+        .live-countdown-card.status-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+        body.dark-mode .live-countdown-card.status-warning {
+            background: #451a03;
+            border-color: #d97706;
+        }
+
+        .live-countdown-card p {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-active p { color: #166534; }
+        body.dark-mode .status-active p { color: #bbf7d0; }
+
+        .status-alert p { color: #991b1b; }
+        body.dark-mode .status-alert p { color: #fecaca; }
+
+        .status-warning p { color: #b45309; }
+        body.dark-mode .status-warning p { color: #fcd34d; }
+
+        .day-lookup-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border: 1px solid var(--banner-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-lookup-card label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .day-lookup-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .day-lookup-controls select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--banner-border);
+            background: var(--bg-app);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .day-result-badge {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            background: var(--banner-bg);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--banner-border);
+        }
+
+        h2.section-title {
+            font-size: 1rem;
+            color: var(--primary);
+            margin: 20px 0 10px 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .block-dropdown {
+            background: var(--card-bg);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            overflow: hidden;
+            border-left: 5px solid var(--primary);
+            position: relative;
+        }
+
+        .block-dropdown.b-a { border-left-color: #f97316; }
+        .block-dropdown.b-b { border-left-color: #0ea5e9; }
+        .block-dropdown.b-c { border-left-color: #eab308; }
+        .block-dropdown.b-d { border-left-color: #22c55e; }
+        .block-dropdown.b-config { border-left-color: #3b82f6; }
+
+        .block-dropdown.block-outage {
+            background: #fff5f5;
+            box-shadow: 0 0 0 2px #f87171;
+        }
+        body.dark-mode .block-dropdown.block-outage {
+            background: #2a1215;
+            box-shadow: 0 0 0 2px #dc2626;
+        }
+
+        .outage-badge {
+            display: none;
+            background: #fee2e2;
+            color: #991b1b;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-left: 8px;
+            border: 1px solid #fca5a5;
+        }
+        body.dark-mode .outage-badge {
+            background: #7f1d1d;
+            color: #fecaca;
+            border-color: #991b1b;
+        }
+
+        .block-dropdown.block-outage .outage-badge {
+            display: inline-block;
+        }
+
+        .dropdown-header {
+            padding: 15px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .dropdown-header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-header::after {
+            content: '▼';
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .block-dropdown.active .dropdown-header::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: var(--card-bg);
+            padding: 0 15px;
+        }
+
+        body.dark-mode .dropdown-content {
+            background: #111827;
+        }
+
+        .block-dropdown.active .dropdown-content {
+            max-height: 2500px;
+            padding: 10px 15px 15px 15px;
+        }
+
+        .zone-item {
+            padding: 8px 10px;
+            background: var(--bg-app);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--banner-border);
+        }
+
+        .zone-item.special-highlight {
+            background: #fef3c7 !important;
+            border: 1px solid #f59e0b;
+            cursor: pointer;
+        }
+
+        body.dark-mode .zone-item.special-highlight {
+            background: #451a03 !important;
+            border-color: #d97706;
+        }
+
+        .zone-name {
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .special-highlight .zone-name {
+            color: #b45309;
+        }
+
+        body.dark-mode .special-highlight .zone-name {
+            color: #fcd34d;
+        }
+
+        .zone-hours-tag {
+            font-size: 0.7rem;
+            background: var(--card-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .special-highlight .zone-hours-tag {
+            background: #fde68a;
+            color: #92400e;
+        }
+
+        body.dark-mode .special-highlight .zone-hours-tag {
+            background: #78350f;
+            color: #fde68a;
+        }
+
+        .weekly-schedule-box {
+            margin-top: 8px;
+            background: var(--card-bg);
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 0.7rem;
+            display: none;
+            border: 1px solid #fcd34d;
+        }
+
+        .weekly-schedule-box.show {
+            display: block;
+        }
+
+        .weekly-schedule-box table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .weekly-schedule-box th, .weekly-schedule-box td {
+            border: 1px solid var(--banner-border);
+            padding: 3px 2px;
+            font-size: 0.65rem;
+            color: var(--text-main);
+        }
+
+        .weekly-schedule-box th {
+            background: #fef3c7;
+            color: #b45309;
+            font-weight: bold;
+        }
+
+        body.dark-mode .weekly-schedule-box th {
+            background: #78350f;
+            color: #fde68a;
+        }
+
+        .tap-hint {
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        .report-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border: 1px solid var(--banner-border);
+        }
+
+        .btn-report {
+            width: 100%;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn-report:hover {
+            background: #dc2626;
+        }
+
+        .report-history-list {
+            margin-top: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .report-item {
+            font-size: 0.8rem;
+            background: var(--bg-app);
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--banner-border);
+        }
+
+        .btn-clear-reports {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 8px;
+            display: block;
+            text-align: right;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <button class="btn-theme" onclick="toggleDarkMode()" id="themeBtn">🌙</button>
+            <h1>Cronograma Eléctrico</h1>
+            <p id="currentWeekBanner">Actualizando...</p>
+        </header>
+
+        <!-- Selector de Sector Favorito -->
+        <div class="favorite-selector">
+            <label for="favSelect">⭐ Mi Sector:</label>
+            <select id="favSelect" onchange="onFavoriteChange()">
+                <option value="Cdad. Tavacare">Cdad. Tavacare</option>
+                <option value="Don Simón" selected>Don Simón</option>
+                <option value="Estadio">Estadio</option>
+                <option value="Punta Gorda">Punta Gorda</option>
+            </select>
+        </div>
+
+        <!-- Selector Rápido de Días -->
+        <div class="day-lookup-card">
+            <label for="lookupDaySelect">🔍 Consultar Día:</label>
+            <div class="day-lookup-controls">
+                <select id="lookupDaySelect" onchange="updateDayLookupResult()">
+                    <option value="0">Lunes</option>
+                    <option value="1">Martes</option>
+                    <option value="2">Miércoles</option>
+                    <option value="3">Jueves</option>
+                    <option value="4">Viernes</option>
+                    <option value="5">Sábado</option>
+                    <option value="6">Domingo</option>
+                </select>
+                <div class="day-result-badge" id="lookupResultBadge">--:--</div>
+            </div>
+        </div>
+
+        <!-- Barra de Estado en Vivo -->
+        <div class="live-countdown-card status-active" id="countdownBanner">
+            <p id="countdownText">Calculando estado del servicio...</p>
+        </div>
+
+        <h2 class="section-title">Bloques</h2>
+
+        <!-- BLOQUE A -->
+        <div class="block-dropdown b-a" id="dropdown-a">
+            <div class="dropdown-header" onclick="toggleDropdown('dropdown-a')">
+                <div class="dropdown-header-left">
+                    <span>Bloque A</span>
+                    <span class="outage-badge" id="badge-a">Sin Luz Ahora 🔴</span>
+                </div>
+            </div>
+            <div class="dropdown-content">
+                <ul style="list-style:none;">
+                    <li class="zone-item"><div class="zone-name">ALTO BARINAS I 34,5 kV <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item"><div class="zone-name">GUASIMITO <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item"><div class="zone-name">CENTRO <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item"><div class="zone-name">SUR <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item"><div class="zone-name">LAS PALMAS <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item"><div class="zone-name">PRIMERO DICIEMBRE <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item"><div class="zone-name">BORBURATA <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item"><div class="zone-name">CDAD VARYNA <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item special-highlight" onclick="toggleSchedule(event, this)">
+                        <div class="zone-name">CDAD. TAVACARE <span class="zone-hours-tag">Bloque A</span></div>
+                        <span class="tap-hint">👆 Toca para ver horario</span>
+                        <div class="weekly-schedule-box">
+                            <table>
+                                <tr><th>L</th><th>M</th><th>Mi</th><th>J</th><th>V</th><th>S</th><th>D</th></tr>
+                                <tr id="sched-tavacare"><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                            </table>
+                        </div>
+                    </li>
+                    <li class="zone-item"><div class="zone-name">CDAD BOLIVIA II <span class="zone-hours-tag">Bloque A</span></div></li>
+                    <li class="zone-item"><div class="zone-name">TICOPORO <span class="zone-hours-tag">Bloque A</span></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BLOQUE B -->
+        <div class="block-dropdown b-b" id="dropdown-b">
+            <div class="dropdown-header" onclick="toggleDropdown('dropdown-b')">
+                <div class="dropdown-header-left">
+                    <span>Bloque B</span>
+                    <span class="outage-badge" id="badge-b">Sin Luz Ahora 🔴</span>
+                </div>
+            </div>
+            <div class="dropdown-content">
+                <ul style="list-style:none;">
+                    <li class="zone-item"><div class="zone-name">BARINITAS 34,5 kV <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item"><div class="zone-name">PARANGULA <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item"><div class="zone-name">CENTRO NORTE <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item"><div class="zone-name">PAGUEYCITO <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item"><div class="zone-name">NEGRO PRIMERO <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item"><div class="zone-name">HORMIGA <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item special-highlight" onclick="toggleSchedule(event, this)">
+                        <div class="zone-name">DON SIMON <span class="zone-hours-tag">Bloque B</span></div>
+                        <span class="tap-hint">👆 Toca para ver horario</span>
+                        <div class="weekly-schedule-box">
+                            <table>
+                                <tr><th>L</th><th>M</th><th>Mi</th><th>J</th><th>V</th><th>S</th><th>D</th></tr>
+                                <tr id="sched-donsimon"><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                            </table>
+                        </div>
+                    </li>
+                    <li class="zone-item"><div class="zone-name">CURBATI <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item"><div class="zone-name">CAPITANEJO 34,5 kV <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item"><div class="zone-name">LUCHA PAIVA <span class="zone-hours-tag">Bloque B</span></div></li>
+                    <li class="zone-item"><div class="zone-name">STA ROSA <span class="zone-hours-tag">Bloque B</span></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BLOQUE C -->
+        <div class="block-dropdown b-c" id="dropdown-c">
+            <div class="dropdown-header" onclick="toggleDropdown('dropdown-c')">
+                <div class="dropdown-header-left">
+                    <span>Bloque C</span>
+                    <span class="outage-badge" id="badge-c">Sin Luz Ahora 🔴</span>
+                </div>
+            </div>
+            <div class="dropdown-content">
+                <ul style="list-style:none;">
+                    <li class="zone-item"><div class="zone-name">EXPRESA 34,5 kV <span class="zone-hours-tag">Bloque C</span></div></li>
+                    <li class="zone-item special-highlight" onclick="toggleSchedule(event, this)">
+                        <div class="zone-name">ESTADIO <span class="zone-hours-tag">Bloque C</span></div>
+                        <span class="tap-hint">👆 Toca para ver horario</span>
+                        <div class="weekly-schedule-box">
+                            <table>
+                                <tr><th>L</th><th>M</th><th>Mi</th><th>J</th><th>V</th><th>S</th><th>D</th></tr>
+                                <tr id="sched-estadio"><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                            </table>
+                        </div>
+                    </li>
+                    <li class="zone-item"><div class="zone-name">BOLIVAR <span class="zone-hours-tag">Bloque C</span></div></li>
+                    <li class="zone-item"><div class="zone-name">RAUL LEONI <span class="zone-hours-tag">Bloque C</span></div></li>
+                    <li class="zone-item"><div class="zone-name">SOCOPO I <span class="zone-hours-tag">Bloque C</span></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BLOQUE D -->
+        <div class="block-dropdown b-d" id="dropdown-d">
+            <div class="dropdown-header" onclick="toggleDropdown('dropdown-d')">
+                <div class="dropdown-header-left">
+                    <span>Bloque D</span>
+                    <span class="outage-badge" id="badge-d">Sin Luz Ahora 🔴</span>
+                </div>
+            </div>
+            <div class="dropdown-content">
+                <ul style="list-style:none;">
+                    <li class="zone-item"><div class="zone-name">ALTO BARINAS II 34,5 kV <span class="zone-hours-tag">Bloque D</span></div></li>
+                    <li class="zone-item"><div class="zone-name">OBISPOS 34,5 kV <span class="zone-hours-tag">Bloque D</span></div></li>
+                    <li class="zone-item"><div class="zone-name">INDUSTRIAL <span class="zone-hours-tag">Bloque D</span></div></li>
+                    <li class="zone-item special-highlight" onclick="toggleSchedule(event, this)">
+                        <div class="zone-name">PUNTA GORDA <span class="zone-hours-tag">Bloque D</span></div>
+                        <span class="tap-hint">👆 Toca para ver horario</span>
+                        <div class="weekly-schedule-box">
+                            <table>
+                                <tr><th>L</th><th>M</th><th>Mi</th><th>J</th><th>V</th><th>S</th><th>D</th></tr>
+                                <tr id="sched-puntagorda"><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                            </table>
+                        </div>
+                    </li>
+                    <li class="zone-item"><div class="zone-name">CDAD BOLIVIA I <span class="zone-hours-tag">Bloque D</span></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE CONFIGURACIÓN POR SEMANAS (DESPLEGABLE) -->
+        <h2 class="section-title">Ajustes</h2>
+        <div class="block-dropdown b-config" id="dropdown-config">
+            <div class="dropdown-header" onclick="toggleDropdown('dropdown-config')">
+                <div class="dropdown-header-left">
+                    <span>⚙️ Administrar Cronograma por Semanas</span>
+                </div>
+            </div>
+            <div class="dropdown-content">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; margin-top: 5px;">Configura el título del mes y los 7 números para cada semana.</p>
+                
+                <label style="font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 4px;">Título del Mes:</label>
+                <input type="text" id="configMonthTitle" placeholder="Ej: Agosto 2026" style="width: 100%; padding: 8px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--banner-border); background: var(--bg-app); color: var(--text-main);">
+
+                <!-- Semana 1 -->
+                <div style="background: var(--bg-app); padding: 10px; border-radius: 10px; margin-bottom: 12px; border: 1px solid var(--banner-border);">
+                    <div style="font-size: 0.85rem; font-weight: bold; color: var(--accent); margin-bottom: 6px;">📅 Semana 1</div>
+                    <input type="text" id="s1Range" placeholder="Rango: Del 03 al 09 de Agosto" style="width:100%; padding:6px; margin-bottom:8px; border-radius:6px; border:1px solid var(--banner-border); background:var(--card-bg); color:var(--text-main); font-size:0.75rem;">
+                    
+                    <label style="font-size: 0.75rem; font-weight: bold; display: block; margin-bottom: 2px;">Números:</label>
+                    <input type="text" id="s1Tavacare" placeholder="7 números separados por comas" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--banner-border); background:var(--card-bg); color:var(--text-main); font-size:0.75rem;">
+                </div>
+
+                <!-- Semana 2 -->
+                <div style="background: var(--bg-app); padding: 10px; border-radius: 10px; margin-bottom: 12px; border: 1px solid var(--banner-border);">
+                    <div style="font-size: 0.85rem; font-weight: bold; color: var(--accent); margin-bottom: 6px;">📅 Semana 2</div>
+                    <input type="text" id="s2Range" placeholder="Rango: Del 10 al 16 de Agosto" style="width:100%; padding:6px; margin-bottom:8px; border-radius:6px; border:1px solid var(--banner-border); background:var(--card-bg); color:var(--text-main); font-size:0.75rem;">
+                    
+                    <label style="font-size: 0.75rem; font-weight: bold; display: block; margin-bottom: 2px;">Números:</label>
+                    <input type="text" id="s2Tavacare" placeholder="7 números separados por comas" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--banner-border); background:var(--card-bg); color:var(--text-main); font-size:0.75rem;">
+                </div>
+
+                <!-- Semana 3 -->
+                <div style="background: var(--bg-app); padding: 10px; border-radius: 10px; margin-bottom: 12px; border: 1px solid var(--banner-border);">
+                    <div style="font-size: 0.85rem; font-weight: bold; color: var(--accent); margin-bottom: 6px;">📅 Semana 3</div>
+                    <input type="text" id="s3Range" placeholder="Rango: Del 17 al 23 de Agosto" style="width:100%; padding:6px; margin-bottom:8px; border-radius:6px; border:1px solid var(--banner-border); background:var(--card-bg); color:var(--text-main); font-size:0.75rem;">
+                    
+                    <label style="font-size: 0.75rem; font-weight: bold; display: block; margin-bottom: 2px;">Números:</label>
+                    <input type="text" id="s3Tavacare" placeholder="7 números separados por comas" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--banner-border); background:var(--card-bg); color:var(--text-main); font-size:0.75rem;">
+                </div>
+
+                <!-- Semana 4 -->
+                <div style="background: var(--bg-app); padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--banner-border);">
+                    <div style="font-size: 0.85rem; font-weight: bold; color: var(--accent); margin-bottom: 6px;">📅 Semana 4</div>
+                    <input type="text" id="s4Range" placeholder="Rango: Del 24 al 30 de Agosto" style="width:100%; padding:6px; margin-bottom:8px; border-radius:6px; border:1px solid var(--banner-border); background:var(--card-bg); color:var(--text-main); font-size:0.75rem;">
+                    
+                    <label style="font-size: 0.75rem; font-weight: bold; display: block; margin-bottom: 2px;">Números:</label>
+                    <input type="text" id="s4Tavacare" placeholder="7 números separados por comas" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--banner-border); background:var(--card-bg); color:var(--text-main); font-size:0.75rem;">
+                </div>
+
+                <button class="btn-report" style="background: var(--accent); margin-bottom: 8px;" onclick="saveCustomSchedule()">💾 Guardar Cronograma</button>
+                <button class="btn-report" style="background: var(--text-muted);" onclick="resetToDefaultSchedule()">🔄 Restaurar Por Defecto</button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE REPORTES MANUALES -->
+        <h2 class="section-title">Averías y Reportes Extras</h2>
+        <div class="report-card">
+            <p style="font-size: 0.85rem; color: var(--text-muted);">¿Se fue la luz fuera del horario oficial de tu sector?</p>
+            <button class="btn-report" onclick="registerExtraOutage()">🚨 Registrar Apagón Inesperado</button>
+            <div class="report-history-list" id="reportHistoryList">
+                <p style="font-size: 0.75rem; color: var(--text-muted); text-align:center; padding: 10px;">No hay reportes recientes guardados.</p>
+            </div>
+            <button class="btn-clear-reports" onclick="clearReports()" id="btnClearReports" style="display:none;">Borrar historial</button>
+        </div>
+
+    </div>
+
+    <script>
+      
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(() => console.log("Service Worker registrado con éxito."))
+                    .catch((err) => console.log("Error al registrar Service Worker:", err));
+            });
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
+            document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
+        }
+
+        function onFavoriteChange() {
+            const selected = document.getElementById("favSelect").value;
+            localStorage.setItem("favoriteSector", selected);
+            updateLiveStatus();
+            updateDayLookupResult();
+        }
+
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle("active");
+        }
+
+        function toggleSchedule(event, element) {
+            const box = element.querySelector(".weekly-schedule-box");
+            box.classList.toggle("show");
+            event.stopPropagation();
+        }
+
+        function formatTimeShort(h) {
+            let period = h >= 12 ? 'pm' : 'am';
+            let hour12 = h % 12 || 12;
+            return `${hour12}${period}`;
+        }
+
+        function formatTimeLive(h) {
+            let period = h >= 12 ? 'PM' : 'AM';
+            let hour12 = h % 12 || 12;
+            return `${hour12}:00 ${period}`;
+        }
+
+        function getStoredSchedules() {
+            const saved = localStorage.getItem("customMonthlySchedules");
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return {
+                monthTitle: "Agosto 2026",
+                week1: { 
+                    range: "📅 Semana 1 (Del 03 al 09 de Agosto)",
+                    "Cdad. Tavacare": [8, 3, 22, 13, 8, 3, 22],
+                    "Don Simón":       [13, 8, 3, 22, 13, 8, 3],
+                    "Estadio":         [22, 13, 8, 3, 22, 13, 8],
+                    "Punta Gorda":     [3, 22, 13, 8, 3, 22, 13]
+                },
+                week2: { 
+                    range: "📅 Semana 2 (Del 10 al 16 de Agosto)",
+                    "Cdad. Tavacare": [13, 8, 3, 22, 13, 8, 3],
+                    "Don Simón":       [22, 13, 8, 3, 22, 13, 8],
+                    "Estadio":         [3, 22, 13, 8, 3, 22, 13],
+                    "Punta Gorda":     [8, 3, 22, 13, 8, 3, 22]
+                },
+                week3: { 
+                    range: "📅 Semana 3 (Del 17 al 23 de Agosto)",
+                    "Cdad. Tavacare": [22, 13, 8, 3, 22, 13, 8],
+                    "Don Simón":       [3, 22, 13, 8, 3, 22, 13],
+                    "Estadio":         [8, 3, 22, 13, 8, 3, 22],
+                    "Punta Gorda":     [13, 8, 3, 22, 13, 8, 3]
+                },
+                week4: { 
+                    range: "📅 Semana 4 (Del 24 al 30 de Agosto)",
+                    "Cdad. Tavacare": [3, 22, 13, 8, 3, 22, 13],
+                    "Don Simón":       [8, 3, 22, 13, 8, 3, 22],
+                    "Estadio":         [13, 8, 3, 22, 13, 8, 3],
+                    "Punta Gorda":     [22, 13, 8, 3, 22, 13, 8]
+                }
+            };
+        }
+
+        function getCurrentWeekData(date) {
+            const schedules = getStoredSchedules();
+            const dayOfMonth = date.getDate();
+            
+            if (dayOfMonth >= 1 && dayOfMonth <= 9) return schedules.week1;
+            if (dayOfMonth >= 10 && dayOfMonth <= 16) return schedules.week2;
+            if (dayOfMonth >= 17 && dayOfMonth <= 23) return schedules.week3;
+            return schedules.week4; 
+        }
+
+        function parseCSVNumbers(text) {
+            return text.split(',').map(num => parseInt(num.trim())).filter(n => !isNaN(n));
+        }
+
+        function saveCustomSchedule() {
+            const title = document.getElementById("configMonthTitle").value;
+            
+            function rotate(arr, shift) {
+                if (!arr || arr.length === 0) return [0,0,0,0,0,0,0];
+                let res = [];
+                for(let i=0; i<7; i++) {
+                    res.push(arr[(i + shift) % arr.length]);
+                }
+                return res;
+            }
+
+            const w1Input = parseCSVNumbers(document.getElementById("s1Tavacare").value);
+            const w2Input = parseCSVNumbers(document.getElementById("s2Tavacare").value);
+            const w3Input = parseCSVNumbers(document.getElementById("s3Tavacare").value);
+            const w4Input = parseCSVNumbers(document.getElementById("s4Tavacare").value);
+
+            const defaultSch = getStoredSchedules();
+
+            const newSchedule = {
+                monthTitle: title || "Cronograma Actualizado",
+                week1: {
+                    range: document.getElementById("s1Range").value || "Semana 1",
+                    "Cdad. Tavacare": w1Input.length ? w1Input : defaultSch.week1["Cdad. Tavacare"],
+                    "Don Simón": w1Input.length ? rotate(w1Input, 5) : defaultSch.week1["Don Simón"],
+                    "Estadio": w1Input.length ? rotate(w1Input, 3) : defaultSch.week1["Estadio"],
+                    "Punta Gorda": w1Input.length ? rotate(w1Input, 6) : defaultSch.week1["Punta Gorda"]
+                },
+                week2: {
+                    range: document.getElementById("s2Range").value || "Semana 2",
+                    "Cdad. Tavacare": w2Input.length ? w2Input : defaultSch.week2["Cdad. Tavacare"],
+                    "Don Simón": w2Input.length ? rotate(w2Input, 5) : defaultSch.week2["Don Simón"],
+                    "Estadio": w2Input.length ? rotate(w2Input, 3) : defaultSch.week2["Estadio"],
+                    "Punta Gorda": w2Input.length ? rotate(w2Input, 6) : defaultSch.week2["Punta Gorda"]
+                },
+                week3: {
+                    range: document.getElementById("s3Range").value || "Semana 3",
+                    "Cdad. Tavacare": w3Input.length ? w3Input : defaultSch.week3["Cdad. Tavacare"],
+                    "Don Simón": w3Input.length ? rotate(w3Input, 5) : defaultSch.week3["Don Simón"],
+                    "Estadio": w3Input.length ? rotate(w3Input, 3) : defaultSch.week3["Estadio"],
+                    "Punta Gorda": w3Input.length ? rotate(w3Input, 6) : defaultSch.week3["Punta Gorda"]
+                },
+                week4: {
+                    range: document.getElementById("s4Range").value || "Semana 4",
+                    "Cdad. Tavacare": w4Input.length ? w4Input : defaultSch.week4["Cdad. Tavacare"],
+                    "Don Simón": w4Input.length ? rotate(w4Input, 5) : defaultSch.week4["Don Simón"],
+                    "Estadio": w4Input.length ? rotate(w4Input, 3) : defaultSch.week4["Estadio"],
+                    "Punta Gorda": w4Input.length ? rotate(w4Input, 6) : defaultSch.week4["Punta Gorda"]
+                }
+            };
+
+            localStorage.setItem("customMonthlySchedules", JSON.stringify(newSchedule));
+            alert("¡Cronograma guardado con éxito!");
+            
+            refreshScheduleInfo();
+            updateDayLookupResult();
+            updateLiveStatus();
+        }
+
+        function resetToDefaultSchedule() {
+            localStorage.removeItem("customMonthlySchedules");
+            alert("Se ha restaurado el cronograma por defecto.");
+            location.reload();
+        }
+
+        function loadConfigFormValues() {
+            const sch = getStoredSchedules();
+            document.getElementById("configMonthTitle").value = sch.monthTitle;
+
+            ['1', '2', '3', '4'].forEach(i => {
+                const w = sch[`week${i}`];
+                if (w) {
+                    document.getElementById(`s${i}Range`).value = w.range || "";
+                    document.getElementById(`s${i}Tavacare`).value = (w["Cdad. Tavacare"] || []).join(', ');
+                }
+            });
+        }
+
+        function updateScheduleTableCells(activeData) {
+            const setRow = (id, arr) => {
+                const row = document.getElementById(id);
+                if(row && arr) {
+                    row.innerHTML = arr.map(h => `<td>${formatTimeShort(h)}-${formatTimeShort((h+5)%24)}</td>`).join('');
+                }
+            };
+            setRow("sched-tavacare", activeData["Cdad. Tavacare"]);
+            setRow("sched-donsimon", activeData["Don Simón"]);
+            setRow("sched-estadio", activeData["Estadio"]);
+            setRow("sched-puntagorda", activeData["Punta Gorda"]);
+        }
+
+        function refreshScheduleInfo() {
+            const now = new Date();
+            const activeScheduleData = getCurrentWeekData(now);
+            const sch = getStoredSchedules();
+            document.getElementById("currentWeekBanner").innerText = `${sch.monthTitle} - ${activeScheduleData.range}`;
+            updateScheduleTableCells(activeScheduleData);
+        }
+
+        function updateDayLookupResult() {
+            const now = new Date();
+            const activeScheduleData = getCurrentWeekData(now);
+            const selectedFav = document.getElementById("favSelect").value;
+            const dayIndex = parseInt(document.getElementById("lookupDaySelect").value);
+            
+            const zoneTimes = activeScheduleData[selectedFav];
+            if (zoneTimes && zoneTimes[dayIndex] !== undefined) {
+                const startH = zoneTimes[dayIndex];
+                const endH = (startH + 5) % 24;
+                document.getElementById("lookupResultBadge").innerText = `${formatTimeShort(startH)} - ${formatTimeShort(endH)}`;
+            }
+        }
+
+        function updateLiveStatus() {
+            const now = new Date();
+            const currentDay = now.getDay() === 0 ? 6 : now.getDay() - 1;
+            const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+
+            const activeScheduleData = getCurrentWeekData(now);
+            const selectedFav = document.getElementById("favSelect").value;
+            const zoneTimes = activeScheduleData[selectedFav];
+            const bannerCard = document.getElementById("countdownBanner");
+
+            const blockMapping = {
+                "Cdad. Tavacare": "a",
+                "Don Simón": "b",
+                "Estadio": "c",
+                "Punta Gorda": "d"
+            };
+
+            ['a', 'b', 'c', 'd'].forEach(b => {
+                document.getElementById(`dropdown-${b}`).classList.remove("block-outage");
+            });
+
+            for (const [sector, blockLetter] of Object.entries(blockMapping)) {
+                const times = activeScheduleData[sector];
+                if (times && times[currentDay] !== undefined) {
+                    const startH = times[currentDay];
+                    const startTotalMins = startH * 60;
+                    const endTotalMins = startTotalMins + 300;
+
+                    if (currentTotalMins >= startTotalMins && currentTotalMins < endTotalMins) {
+                        document.getElementById(`dropdown-${blockLetter}`).classList.add("block-outage");
+                    }
+                }
+            }
+
+            if (zoneTimes && zoneTimes[currentDay] !== undefined) {
+                const startH = zoneTimes[currentDay];
+                const startTotalMins = startH * 60;
+                const endTotalMins = startTotalMins + 300; 
+
+                if (currentTotalMins >= startTotalMins && currentTotalMins < endTotalMins) {
+                    const minsLeft = endTotalMins - currentTotalMins;
+                    const hLeft = Math.floor(minsLeft / 60);
+                    const mLeft = minsLeft % 60;
+                    bannerCard.className = "live-countdown-card status-alert";
+                    document.getElementById("countdownText").innerText = `🔴 ${selectedFav} sin luz: Faltan ${hLeft}h ${mLeft}m para que llegue`;
+                } else {
+                    let diff = startTotalMins - currentTotalMins;
+                    if (diff < 0) diff += 1440;
+
+                    const hNext = Math.floor(diff / 60);
+                    const mNext = diff % 60;
+
+                    if (diff <= 15 && diff > 0) {
+                        bannerCard.className = "live-countdown-card status-warning";
+                        document.getElementById("countdownText").innerText = `⚠️ ¡Atención! Corte en ${mNext} min para ${selectedFav} (${formatTimeLive(startH)})`;
+                    } else {
+                        bannerCard.className = "live-countdown-card status-active";
+                        document.getElementById("countdownText").innerText = `🟢 ${selectedFav}: Próximo corte a las ${formatTimeLive(startH)} (en ${hNext}h ${mNext}m)`;
+                    }
+                }
+            }
+        }
+
+        function registerExtraOutage() {
+            const selectedFav = document.getElementById("favSelect").value;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit' });
+            const timeStr = now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+
+            const newReport = {
+                sector: selectedFav,
+                dateTime: `${dateStr} a las ${timeStr}`
+            };
+
+            let reports = JSON.parse(localStorage.getItem("extraReports") || "[]");
+            reports.unshift(newReport);
+            if (reports.length > 10) reports.pop();
+            localStorage.setItem("extraReports", JSON.stringify(reports));
+
+            loadReportHistory();
+        }
+
+        function loadReportHistory() {
+            const reports = JSON.parse(localStorage.getItem("extraReports") || "[]");
+            const container = document.getElementById("reportHistoryList");
+            const btnClear = document.getElementById("btnClearReports");
+
+            if (reports.length === 0) {
+                container.innerHTML = `<p style="font-size: 0.75rem; color: var(--text-muted); text-align:center; padding: 10px;">No hay reportes recientes guardados.</p>`;
+                btnClear.style.display = "none";
+                return;
+            }
+
+            btnClear.style.display = "block";
+            container.innerHTML = reports.map(r => `
+                <div class="report-item">
+                    <span>⚠️ <strong>${r.sector}</strong> (Fuera de horario)</span>
+                    <span style="color: var(--text-muted); font-size: 0.7rem;">${r.dateTime}</span>
+                </div>
+            `).join('');
+        }
+
+        function clearReports() {
+            localStorage.removeItem("extraReports");
+            loadReportHistory();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem("darkMode") === "enabled") {
+                document.body.classList.add("dark-mode");
+                document.getElementById("themeBtn").innerText = "☀️";
+            }
+            const savedFav = localStorage.getItem("favoriteSector");
+            if (savedFav) {
+                document.getElementById("favSelect").value = savedFav;
+            }
+
+            const now = new Date();
+            const currentDayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1;
+            document.getElementById("lookupDaySelect").value = currentDayIndex;
+
+            loadConfigFormValues();
+            refreshScheduleInfo();
+            updateDayLookupResult();
+            updateLiveStatus();
+            loadReportHistory();
+        });
+
+        setInterval(updateLiveStatus, 60000);
+    </script>
+</body>
+</html>
