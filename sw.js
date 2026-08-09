@@ -1,19 +1,8 @@
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open('cronograma-app-v1').then((cache) => {
+    caches.open('cronograma-app-v2').then((cache) => {
       return cache.addAll([
-    './Cronograma.html',
-        './manifest.json'
-      ]);
-    })
-  );
-});
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open('cronograma-app-v1').then((cache) => {
-      return cache.addAll([
-        './Cronograma.html',
+        './index.html',
         './manifest.json',
         './icono.png'
       ]);
@@ -29,3 +18,13 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
+self.addEventListener('push', (e) => {
+  const options = {
+    body: e.data ? e.data.text() : '¡Atención! Hay un cambio en el cronograma eléctrico.',
+    icon: './icono.png',
+    badge: './icono.png'
+  };
+  e.waitUntil(
+    self.registration.showNotification('Cronograma Eléctrico', options)
+  );
+});
