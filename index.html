@@ -980,6 +980,11 @@
                     if (diff <= 15 && diff > 0) {
                         bannerCard.className = "live-countdown-card status-warning";
                         document.getElementById("countdownText").innerText = `⚠️ ¡Atención! Corte en ${mNext} min para ${selectedFav} (${formatTimeLive(startH)})`;
+                    
+
+                          // AGREGA ESTA LÍNEA AQUÍ:
+    verificarNotificacionCorte(diff, selectedFav);
+}
                     } else {
                         bannerCard.className = "live-countdown-card status-active";
                         document.getElementById("countdownText").innerText = `🟢 ${selectedFav}: Próximo corte a las ${formatTimeLive(startH)} (en ${hNext}h ${mNext}m)`;
@@ -1015,6 +1020,25 @@
   });
 }
 
+
+        function verificarNotificacionCorte(diff, sector) {
+    if (diff === 15) {
+        
+        const ultimaNotificacion = localStorage.getItem('ultimaNotif');
+        if (ultimaNotificacion !== new Date().toDateString() + sector) {
+            if (Notification.permission === 'granted') {
+                new Notification('Cronograma Eléctrico', {
+                    body: `¡Atención! La luz se irá en ${sector} en 15 minutos.`,
+                    icon: './icono.png'
+                });
+                localStorage.setItem('ultimaNotif', new Date().toDateString() + sector);
+            }
+        }
+    }
+}
+
+
+        
 
         function loadReportHistory() {
             const reports = JSON.parse(localStorage.getItem("extraReports") || "[]");
