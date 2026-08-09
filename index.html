@@ -1007,6 +1007,15 @@
             loadReportHistory();
         }
 
+        if ('Notification' in window && navigator.serviceWorker) {
+  Notification.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+      console.log('Permiso de notificaciones concedido.');
+    }
+  });
+}
+
+
         function loadReportHistory() {
             const reports = JSON.parse(localStorage.getItem("extraReports") || "[]");
             const container = document.getElementById("reportHistoryList");
